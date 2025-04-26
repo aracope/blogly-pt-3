@@ -1,0 +1,19 @@
+<!-- The page where you can edit a user's information. -->
+{% extends "base.html" %}
+
+{% block title %}Edit {{ user.first_name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h1>Edit {{ user.get_full_name() }}</h1>
+  <form action="/users/{{ user.id }}/edit" method="POST">
+    <input type="text" name="first_name" value="{{ user.first_name }}" required>
+    <input type="text" name="last_name" value="{{ user.last_name }}" required>
+    <input type="url" name="image_url" value="{{ user.image_url }}">
+    <button type="submit">Save</button>
+  </form>
+  <div>
+    <a href="/users/{{ user.id }}"><button type="button">Cancel</button></a>
+  </div>
+</div>
+{% endblock %}

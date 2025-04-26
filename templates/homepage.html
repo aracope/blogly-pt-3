@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Recent Posts</h1>
+<ul class="list-unstyled">
+    {% for post in posts %}
+    <li class="mb-3">
+        <h5>
+            <a href="{{ url_for('show_post', post_id=post.id) }}">{{ post.title }}</a>
+        </h5>
+        <p class="mb-1 text-muted">
+            by {{ post.user.full_name }}
+            <br>
+            {% if post.created_at %}
+            <small>Posted on {{ post.created_at.strftime('%B %-d, %Y, %-I:%M %p') }}</small>
+            {% else %}
+            <small>Posted on unknown date</small>
+            {% endif %}
+        </p>
+    </li>
+    {% else %}
+    <li>No posts yet!</li>
+    {% endfor %}
+</ul>
+</div>
+{% endblock %}

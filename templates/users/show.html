@@ -1,0 +1,46 @@
+<!-- This page shows a detailed view of an individual user's profile, with options to edit or delete the user. -->
+{% extends "base.html" %}
+
+{% block title %}{{ user.get_full_name() }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="card p-4 mb-3">
+    <div class="d-flex align-items-center gap-3">
+      {% if user.image_url %}
+      <img src="{{ user.image_url }}" alt="Profile picture of {{ user.first_name }}" class="rounded-circle">
+      {% endif %}
+    <div>
+      <h1 class="h3 mb-0">{{ user.get_full_name() }}</h1>
+      <p class="text-muted mb-1">{{ user.posts|length }} post{{ user.posts|length != 1 and 's' or '' }}</p>
+    </div>
+  </div>
+</div>
+
+<div class="mb-3">
+    <a href="/users/{{ user.id }}/edit" class="btn btn primary me-2"><button>Edit</button></a>
+    <form action="/users/{{ user.id }}/delete" method="POST"  
+    class="d-inline"
+    onsubmit="return confirm('Are you sure you want to delete this user?');">
+      <button type="submit">Delete</button>
+    </form>
+  </div>
+
+  <h2>Posts</h2>
+  <div class="list-group mb-3">
+    {% for post in user.posts %}
+    <a href="/posts/{{ post.id }}" class="list-group-item list-group-item-action">
+      <strong>{{ post.title }}</strong>
+      {% if post.created_at %}
+      <small class="text-muted">Created: {{ post.created_at.strftime('%B %-d, %Y, %-I:%M %p') }}</small>
+      {% else %}
+        <small class="text-muted">Date unknown</small>
+      {% endif %}
+    </a>
+    {% else %}
+      <p class="text-muted">No posts available.</p>
+    {% endfor %}
+  </div>
+  <a href="/users/{{ user.id }}/posts/new" class="btn btn-success">Add Post</a>
+</div>
+{% endblock %}

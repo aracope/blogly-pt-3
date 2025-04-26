@@ -1,0 +1,19 @@
+<!-- This page lists all users in your application and links to their individual profile pages. -->
+{% extends 'base.html' %}
+
+{% block title %}All Users{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h2>All Users</h2>
+  <ul class="list-group mb-4">
+    {% for user in users %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <a href="/users/{{ user.id }}">{{ user.get_full_name() }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+  <a href="/users/new" class="btn btn-primary">Add New User</a>
+</div>
+{% endblock %}
+

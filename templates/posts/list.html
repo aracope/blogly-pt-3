@@ -3,15 +3,17 @@
 {% block title %}All Posts{% endblock %}
 
 {% block content %}
-<div class="container">
-  <h1>All Posts</h1>
-  <ul class="list-group">
+<div class="container mt-4">
+  <h2>All Posts</h2>
+  <ul class="list-group mb-4">
     {% for post in posts %}
-    <li class="list-group-item">
-      <a href="/posts/{{ post.id }}">{{ post.title }}</a> by <a href="/users/{{ post.user.id }}">{{
-        post.user.get_full_name() }}</a> on {{ post.created_at.strftime('%B %-d, %Y, %-I:%M %p') }}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      <a href="/posts/{{ post.id }}">{{ post.title }}</a>
+      <small class="text-muted">{{ post.created_at.strftime('%b %-d, %Y') if post.created_at else 'Unknown date'
+        }}</small>
     </li>
     {% endfor %}
   </ul>
+  <a href="/users" class="btn btn-secondary">Back to Users</a>
 </div>
 {% endblock %}

@@ -2,6 +2,8 @@ from flask import Flask, redirect, render_template, request, flash
 from models import db, connect_db, User, Post, Tag
 from flask_debugtoolbar import DebugToolbarExtension
 
+from sqlalchemy.orm import joinedload
+
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///blogly_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -16,8 +18,8 @@ with app.app_context():
     db.create_all()
 
 @app.route("/")
-def home():
-    posts = Post.query.order_by(Post.created_at.desc()).limit(5).all()
+def homepage():
+    posts = Post.query.options(joinedload(Post.user)).order_by(Post.created_at.desc()).limit(5).all()
     return render_template("homepage.html", posts=posts)
 
 # USER ROUTES
@@ -108,7 +110,7 @@ def edit_post_form(post_id):
     tags = Tag.query.all()
     return render_template("posts/edit.html", post=post, tags=tags)
 
-@app.route("/posts/<int:post_id>", methods=["POST"])
+@app.route("/posts/<int:post_id>/edit", methods=["POST"])
 def update_post(post_id):
     post = Post.query.get_or_404(post_id)
     post.title = request.form['title']
@@ -161,16 +163,30 @@ def show_tag(tag_id):
     tag = Tag.query.get_or_404(tag_id)
     return render_template("tags/show.html", tag=tag)
 
-@app.route("/tags/<int:tag_id>/edit")
+@app.route("/tags/<int:tag_id>/edit", methods=["GET", "POST"])
 def edit_tag_form(tag_id):
     tag = Tag.query.get_or_404(tag_id)
-    return render_template("tags/edit.html", tag=tag)
+    posts = Post.query.all()  # Fetch all posts
+    if request.method == "POST":
+        tag.name = request.form['name']
+        # Update the tag-post relationships
+        tag.posts = [Post.query.get(int(post_id)) for post_id in request.form.getlist('posts')]  # Update selected posts
+
+        db.session.commit()
+        flash(f"Tag '{tag.name}' updated successfully!", "success")
+        return redirect('/tags')
+    
+    return render_template("tags/edit.html", tag=tag, posts=posts)
 
 @app.route("/tags/<int:tag_id>", methods=["POST"])
 def update_tag(tag_id):
     tag = Tag.query.get_or_404(tag_id)
     tag.name = request.form['name']
+     # Update the posts linked to this tag
+    selected_post_ids = request.form.getlist('posts')
+    tag.posts = [Post.query.get(post_id) for post_id in selected_post_ids]
     db.session.commit()
+    flash(f"Tag '{tag.name}' updated successfully!", "success")
     return redirect('/tags')
 
 @app.route("/tags/<int:tag_id>/delete", methods=["POST"])

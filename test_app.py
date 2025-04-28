@@ -50,7 +50,7 @@ class UserViewsTestCase(TestCase):
     def test_add_user(self):
         with app.test_client() as client:
             data = {"first_name": "New", "last_name": "Person", "image_url": ""}
-            resp = client.post("/users/new", data=data, follow_redirects=True)
+            resp = client.post("/users", data=data, follow_redirects=True)
             html = resp.get_data(as_text=True)
             self.assertEqual(resp.status_code, 200)
             self.assertIn("New Person", html)
@@ -58,7 +58,7 @@ class UserViewsTestCase(TestCase):
     def test_edit_user(self):
         with app.test_client() as client:
             data = {"first_name": "Edited", "last_name": "User", "image_url": ""}
-            resp = client.post(f"/users/{self.test_user_id}/edit", data=data, follow_redirects=True)
+            resp = client.post(f"/users/{self.test_user_id}", data=data, follow_redirects=True)
             html = resp.get_data(as_text=True)
             self.assertEqual(resp.status_code, 200)
             self.assertIn("Edited User", html)
@@ -86,6 +86,7 @@ class UserViewsTestCase(TestCase):
             resp = client.get(f"/users/{self.test_user_id}/edit")
             html = resp.get_data(as_text=True)
             self.assertIn(f'href="/users/{self.test_user_id}"', html)
+
 
 class PostViewsTestCase(TestCase):
     """Tests for views for Posts."""
@@ -121,7 +122,7 @@ class PostViewsTestCase(TestCase):
     def test_add_post(self):
         with app.test_client() as client:
             data = {"title": "Another Post", "content": "More content"}
-            resp = client.post(f"/users/{self.user_id}/posts/new", data=data, follow_redirects=True)
+            resp = client.post(f"/users/{self.user_id}/posts", data=data, follow_redirects=True)
             html = resp.get_data(as_text=True)
             self.assertEqual(resp.status_code, 200)
             self.assertIn("Another Post", html)
